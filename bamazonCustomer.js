@@ -3,7 +3,7 @@ require("dotenv").config()
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
-//creat connection to DB
+//create connection to DB
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -26,12 +26,11 @@ function afterConnection() {
         if (err) throw err;
 
         console.log("BAMAZON STORE");
-        console.log("=====================================================================");
+        console.log("=========================================================================================");
 
         for (let i = 0; i < results.length; i++) {
-            console.log("ID: " + results[i].item_id + " | " + "Product: " + results[i].product_name + " | " + "Department: " + results[i].department_name + " | ");
-            console.log("=====================================================================");
-            displayProducts();
+            console.log("ID: " + results[i].item_id + " | " + "Product: " + results[i].product_name + " | " + "Department: " + results[i].department_name + " | " + "Price: " + "$" + results[i].price + " | ");
+            console.log("=====================================================================================");
         }
 
     });
@@ -71,16 +70,47 @@ function displayProducts() {
                         chosenItem = results[i];
                     }
                 }
+
+                //check requested quantity vs stock
+                //if requested quantity is too high, reduce request and confirm
+                if (chosenItem.stock_quantity > parseInt(answer.amount)) {
+                    connnection.query("UPDATE products SET ? WHERE?", [{
+                            stock_quantity: chosenItem.stock_quantity - parseInt(answer.amount)
+                        },
+                        {
+                            id: chosenItem.id
+                        }
+                    ], function (error) {
+                        if (error) throw err;
+                        console.log("\n\n");
+                        console.log("===========================================");
+                        console.log("Product purchased successfully!");
+                        console.log("===========================================");
+                        console.log("Transaction Summary");
+                        console.log("-------------------------------------------");
+                        console.log("Item Name: " + chosenItem.product_name);
+                        console.log("Item Count: " + parseInt(answer.amount));
+                        console.log("-------------------------------------------");
+                        console.log("Total: " + "$" + (chosenItem.price * parseInt(answer.amount)));
+                        console.log("===========================================");
+                        console.log("\n\n");
+                        displayProducts();
+                    })
+                } else {
+                    console.log("===============================================");
+                    console.log("Insufficient stock.");
+                    console.log("===============================================");
+                    displayProducts();
+                }
             });
     });
-}
-//check requested quantity vs stock
-//if requested quantity is too high, reduce request and comfirm
+};
 
+displayProducts();
 
 //if customer agrees, complete transaction, else cancel transaction
 
-//if quantity is acceptable, make the sale
+//if quantity is acceptable, make the sale 
 
 
 // show the customer the total cost of the sale, and confirm
