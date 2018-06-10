@@ -2,6 +2,7 @@
 require("dotenv").config()
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var console_table = require("console.table");
 
 //create connection to DB
 var connection = mysql.createConnection({
@@ -16,36 +17,34 @@ var connection = mysql.createConnection({
 connection.connect(function (err) {
     if (err) throw err;
     //TESTING CONNECTION TO SQL
-    console.log("Connected as ID " + connection.threadId)
-    afterConnection();
+    //console.log("Connected as ID " + connection.threadId)
+    //afterConnection();
 });
 
 //display list of available products from the DB
-function afterConnection() {
+var display = function() {
     connection.query("SELECT * FROM products", function (err, results) {
         if (err) throw err;
+        console.table(results);
+        console.log("==========================================================================================");
 
-        console.log("BAMAZON STORE");
-        console.log("=========================================================================================");
+        //for (let i = 0; i < results.length; i++) {
+            //console.log("ID: " + results[i].item_id + " | " + "Product: " + results[i].product_name + " | " + "Department: " + results[i].department_name + " | " + "Price: " + "$" + results[i].price + " | ");
+            //console.log("======================================================================================");
+        })
+    };
 
-        for (let i = 0; i < results.length; i++) {
-            console.log("ID: " + results[i].item_id + " | " + "Product: " + results[i].product_name + " | " + "Department: " + results[i].department_name + " | " + "Price: " + "$" + results[i].price + " | ");
-            console.log("=====================================================================================");
-        }
-
-    });
-}
 
 //show the list to the customer and allow them to select a product
-function displayProducts() {
+var run = function() {
     //query the database for all items being auctioned
     connection.query("SELECT * FROM products", function (err, results) {
         if (err) throw err;
         //once you have the items, prompt user for which item they want to buy
         inquirer
             .prompt([{
-                    name: "choice",
-                    type: "rawlist",
+                    name: "product",
+                    type: "list",
                     choices: function () {
                         var choiceArray = [];
                         for (var i = 0; i < results.length; i++) {
@@ -57,16 +56,16 @@ function displayProducts() {
                 },
                 //use inquirer to ask quantity
                 {
-                    name: "quantity",
+                    name: "amount",
                     type: "input",
                     message: "How many would you like to purchase?"
                 }
             ])
-            //after product is selected, show details 
+            //after product is selected, show details
             .then(function (answer) {
                 var chosenItem;
                 for (var i = 0; i < results.length; i++) {
-                    if (results[i].product_name === answer.choice) {
+                    if (results[i].product_name === answer.product) {
                         chosenItem = results[i];
                     }
                 }
@@ -94,30 +93,21 @@ function displayProducts() {
                         console.log("Total: " + "$" + (chosenItem.price * parseInt(answer.amount)));
                         console.log("===========================================");
                         console.log("\n\n");
-                        displayProducts();
+                        display();
+                        run();
                     })
                 } else {
                     console.log("===============================================");
                     console.log("Insufficient stock.");
                     console.log("===============================================");
-                    displayProducts();
+                    display();
+                    run();
                 }
             });
     });
 };
 
-displayProducts();
-
-//if customer agrees, complete transaction, else cancel transaction
-
-//if quantity is acceptable, make the sale 
-
-
-// show the customer the total cost of the sale, and confirm
-
-//if customer purchases, update stock on DB
-
-//else, cancel transaction
-
+display();
+run();
 
 //close connection

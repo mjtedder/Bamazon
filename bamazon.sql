@@ -30,4 +30,7 @@ VALUES ('Espresso 4000', 'Appliances', 100, 30);
 INSERT INTO products(product_name, department_name, price, stock_quantity)
 VALUES ('Sony PlayStation 9', 'Entertainment', 900, 9);
 
+INSERT INTO products(product_name, department_name, price, stock_quantity)
+VALUES ('')
+
 SELECT * FROM products;
