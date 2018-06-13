@@ -20,5 +20,7 @@ VALUES ('Apple iPhone X', 'Electronics', 999.99, 300),
 ('Super Mario Odyssey', 'Video Games', 59.95, 80),
 ('Nintendo Switch', 'Video Games', 299.99, 100),
 ('Espresso 4000', 'Appliances', 199.99, 30),
-('Sony PlayStation 4', 'Video Games', 399.95, 204);
-()
+('Sony PlayStation 4', 'Video Games', 399.95, 204),
+('Fight Club', 'Books', 19.95, 43),
+('Dragon Quest XI', 'Video Games', 79.99, 29),
+('Cup Noodles', 'Food', 0.99, 99);
